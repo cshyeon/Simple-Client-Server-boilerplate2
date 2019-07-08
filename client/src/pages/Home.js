@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import classNames from 'classnames';
+import { Trans, withTranslation } from 'react-i18next';
 
 import {friendActions} from '@/store/miniApps';
 
@@ -15,17 +16,25 @@ class Home extends Component {
   /* redux test */
   onAdd = () => {
     const friend = {id: this.getRandomId(), name: 'david', age: 23};
-    this.props.addFriend(friend);
+    this.props.addFriend(friend);  
   }
   onRemove = () => {
     const removeId = this.getRandomId();
     const friend = {id: removeId};
     this.props.removeFriend(friend);
   }
+  changeLanguage = (e) => {
+    const lang = e.target.dataset.language || 'en';
+    this.props.i18n.changeLanguage(lang);
+  }
 
   render() {
     return (
       <div className={classNames('home')}>   
+        <Trans i18nKey="hello">Welcome to <strong>React</strong></Trans>
+        <button data-language="ko" onClick={this.changeLanguage}>ko</button>
+        <button data-language="en" onClick={this.changeLanguage}>en</button>
+
         <img src={logo} className="App-logo" alt="logo" />
         <p>
           Edit <code>src/App.js</code> and save to reload.
@@ -57,4 +66,4 @@ const mapStateToProps = state => {
 //   };
 // };
 
-export default connect(mapStateToProps, friendActions)(Home);
+export default withTranslation()(connect(mapStateToProps, friendActions)(Home));
