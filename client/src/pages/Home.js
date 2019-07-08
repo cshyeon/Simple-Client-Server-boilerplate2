@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import classNames from 'classnames';
 
-import * as actions from '../store/miniApps/friend/state';
+import {friendActions} from '../store/miniApps';
 
 import logo from 'assets/logo.svg';
 
@@ -57,4 +57,4 @@ const mapStateToProps = state => {
 //   };
 // };
 
-export default connect(mapStateToProps, actions)(Home);
+export default connect(mapStateToProps, friendActions)(Home);
