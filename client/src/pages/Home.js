@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import classNames from 'classnames';
 
-import {friendActions} from '../store/miniApps';
+import {friendActions} from '@/store/miniApps';
 
 import logo from 'assets/logo.svg';
 
