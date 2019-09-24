@@ -25,7 +25,7 @@ async function serverListener(req, res) {
 
     const methodRouter = existRouter(url, method);
 
-    if (methodRouter[dddd]) {
+    if (methodRouter) {
       // console.log('methodrouter:', methodRouter);
       const routerResult = await methodRouter(req, res);
       res.end(routerResult);
