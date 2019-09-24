@@ -1,24 +1,57 @@
 const http = require('http');
 
-const httpServer = http.createServer(serverListener);
+const routerMaps = {};
+const routerAvailableMethods = { GET: true, POST: true };
 
-function serverListener(req, res) {
-  console.log('Receive Request!', req.body);
+const ALARM_MEESAGES = {
+  EXIST_ROUTER: '해당 path, method에 등록된 라우터가 이미 존재합니다.',
+  INVALID_ROUTER_METHOD: '허용되지 않은 method 입니다.',
+};
+
+function existRouter(url, method) {
+  return routerMaps[url] && routerMaps[url][method];
+}
+
+
+async function serverListener(req, res) {
+  const { method, url } = req;
+  console.log('Receive Request!', method, url);
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'OPTIONS, GET, POST, DELETE');
   res.setHeader('Access-Control-Allow-Headers', 'Authorization, Content-Type, Cache-Control, Pragma, Expires');
 
-  req.pipe(res);
+  if (method === 'OPTIONS') { return res.end(); }
+
+  const methodRouter = existRouter(url, method);
+
+  if (methodRouter) {
+    // console.log('methodrouter:', methodRouter);
+    const routerResult = await methodRouter(req, res);
+    res.end(routerResult);
+  } else {
+    req.pipe(res);
+  }
 }
 
-const PORT = 8000;
+const httpServer = http.createServer(serverListener);
 
+const DEFAULT_PORT = 8000;
 const HttpServer = {
-  on() {
-    httpServer.listen(PORT, () => {
-      console.log(`Server is Running on ${PORT}`);
+  on(port) {
+    Object.freeze(routerMaps); // freeze all router.
+
+    const listenPort = port || DEFAULT_PORT;
+    httpServer.listen(listenPort, () => {
+      console.log(`Server is Running on ${listenPort}`);
+      // console.log('routerMaps:', routerMaps);
     });
-  }
+  },
+  onRouter(path, method, router) {
+    if (!routerAvailableMethods[method]) throw new Error(`(path: ${path}, method: ${method}) ${ALARM_MEESAGES.INVALID_ROUTER_METHOD}`);
+    if (!routerMaps[path]) routerMaps[path] = {};
+    if (routerMaps[path][method]) throw new Error(`(path: ${path}, method: ${method}) ${ALARM_MEESAGES.EXIST_ROUTER}`);
+    routerMaps[path][method] = router;
+  },
 };
 
 module.exports = {
