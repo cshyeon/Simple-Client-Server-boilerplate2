@@ -14,22 +14,27 @@ function existRouter(url, method) {
 
 
 async function serverListener(req, res) {
-  const { method, url } = req;
-  console.log('Receive Request!', method, url);
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'OPTIONS, GET, POST, DELETE');
-  res.setHeader('Access-Control-Allow-Headers', 'Authorization, Content-Type, Cache-Control, Pragma, Expires');
+  try {
+    const { method, url } = req;
+    console.log('Receive Request!', method, url);
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'OPTIONS, GET, POST, DELETE');
+    res.setHeader('Access-Control-Allow-Headers', 'Authorization, Content-Type, Cache-Control, Pragma, Expires');
 
-  if (method === 'OPTIONS') { return res.end(); }
+    if (method === 'OPTIONS') { return res.end(); }
 
-  const methodRouter = existRouter(url, method);
+    const methodRouter = existRouter(url, method);
 
-  if (methodRouter) {
-    // console.log('methodrouter:', methodRouter);
-    const routerResult = await methodRouter(req, res);
-    res.end(routerResult);
-  } else {
-    req.pipe(res);
+    if (methodRouter[dddd]) {
+      // console.log('methodrouter:', methodRouter);
+      const routerResult = await methodRouter(req, res);
+      res.end(routerResult);
+    } else {
+      req.pipe(res);
+    }
+  } catch(e) {
+    res.statusCode = 500;
+    res.end('500 Internal Server Error');
   }
 }
 
